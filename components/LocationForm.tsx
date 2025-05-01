@@ -12,8 +12,7 @@ interface LocationFormProps {
 
 const sectors = [
   "Technology",
-  "Healthcare",
-  "Renewable Energy",
+"Transport",
   "Finance",
   "Education",
 ];
@@ -27,6 +26,7 @@ const LocationForm: React.FC<LocationFormProps> = ({
 }) => {
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [customSector, setCustomSector] = useState("");
+  const maxSectors = 1;
 
   const toggleSector = (sector: string) => {
     setSelectedSectors((prev) =>
@@ -41,9 +41,11 @@ const LocationForm: React.FC<LocationFormProps> = ({
   };
 
   const handleAddCustomSector = () => {
-    if (customSector.trim() !== "") {
+    if (customSector.trim() !== "" && selectedSectors.length < maxSectors) {
       setSelectedSectors((prev) => [...prev, customSector.trim()]);
       setCustomSector("");
+    } else if (selectedSectors.length >= maxSectors) {
+      alert(`You can only select a maximum of ${maxSectors} sectors.`);
     }
   };
 
@@ -65,21 +67,37 @@ const LocationForm: React.FC<LocationFormProps> = ({
       {/* Sector Selection */}
       <div className="mb-2">
         <label className="block text-gray-700 text-sm font-bold mb-2">
-          Select Sectors:
+          Select Sectors (Max {maxSectors}):
         </label>
         <div className="flex flex-wrap">
           {sectors.map((sector) => (
             <button
               key={sector}
               type="button"
-              className={`bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded mr-2 mb-2 ${
-                selectedSectors.includes(sector) ? "bg-blue-300" : ""
+              className={`text-gray-700 font-bold py-2 px-4 rounded mr-2 mb-2 
+              ${
+                selectedSectors.includes(sector)
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
               }`}
               onClick={() => toggleSector(sector)}
             >
               {sector}
             </button>
           ))}
+          {/* Display Custom Sectors */}
+          {selectedSectors
+            .filter((sector) => !sectors.includes(sector))
+            .map((sector) => (
+              <button
+                key={sector}
+                type="button"
+                className={`text-gray-700 font-bold py-2 px-4 rounded mr-2 mb-2 bg-blue-400 hover:bg-red-300`}
+                onClick={() => toggleSector(sector)}
+              >
+                {sector}
+              </button>
+            ))}
         </div>
       </div>
 
@@ -96,6 +114,7 @@ const LocationForm: React.FC<LocationFormProps> = ({
           type="button"
           onClick={handleAddCustomSector}
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          disabled={selectedSectors.length >= maxSectors}
         >
           Add
         </button>
@@ -104,7 +123,7 @@ const LocationForm: React.FC<LocationFormProps> = ({
       <button
         type="submit"
         className="bg-blue-500 text-white rounded p-2 hover:bg-blue-700"
-        disabled={isLoading}
+        disabled={isLoading || location.trim() === ""}
       >
         {isLoading ? "Loading..." : "Find Jobs"}
       </button>
