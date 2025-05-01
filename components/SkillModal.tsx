@@ -1,6 +1,8 @@
 // components/SkillModal.tsx
 import React, { useState, useEffect } from "react";
 import Roadmap from "@/components/Roadmap";
+import PDFDocument from "@/components/PDFDocument";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 interface Skill {
   skillName: string;
@@ -30,11 +32,13 @@ const SkillModal: React.FC<SkillModalProps> = ({
   const [roadmaps, setRoadmaps] = useState<RoadmapStep[][]>([]);
   const [isLoading, setIsLoading] = useState(true); // Start with loading true
   const [error, setError] = useState<string | null>(null);
+  const [allRoadmapsLoaded, setAllRoadmapsLoaded] = useState(false);
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
       setIsLoading(true);
       setError(null);
+      setAllRoadmapsLoaded(false);
 
       try {
         const roadmapPromises = skills.map(async (skill) => {
@@ -60,9 +64,11 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
         const roadmapsData = await Promise.all(roadmapPromises);
         setRoadmaps(roadmapsData);
+        setAllRoadmapsLoaded(true);
       } catch (error: any) {
         setError(error.message);
         setRoadmaps([]);
+        setAllRoadmapsLoaded(false);
       } finally {
         setIsLoading(false);
       }
@@ -73,6 +79,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
     } else {
       setRoadmaps([]); // Clear roadmaps when the modal is closed or skills are empty
       setIsLoading(true); // Reset loading state when modal is closed
+      setAllRoadmapsLoaded(false);
     }
   }, [isOpen, skills]);
 
@@ -104,12 +111,28 @@ const SkillModal: React.FC<SkillModalProps> = ({
             </div>
           ))}
         </div>
-        <button
-          onClick={onClose}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
-        >
-          Close
-        </button>
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={onClose}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Close
+          </button>
+          <PDFDownloadLink
+            document={
+              <PDFDocument
+                jobTitle={jobTitle || "N/A"}
+                skills={skills}
+                roadmaps={roadmaps}
+              />
+            }
+            fileName={`Skills and Roadmap for ${jobTitle || "N/A"}.pdf`}
+          >
+            {({ blob, url, loading, error }) =>
+              loading ? "Loading document..." : "Export to PDF"
+            }
+          </PDFDownloadLink>
+        </div>
       </div>
     </div>
   );

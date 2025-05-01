@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "^1.6.4",
+    "@react-pdf/renderer": "^4.3.0",
     "beeai-framework": "^0.1.12",
     "dotenv": "^16.5.0",
     "jsonrepair": "^3.12.0",
