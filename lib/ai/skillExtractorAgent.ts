@@ -2,6 +2,7 @@
 import { WatsonxChatModel } from "beeai-framework/adapters/watsonx/backend/chat";
 import { Message } from "beeai-framework/backend/core";
 import { jsonrepair } from "jsonrepair";
+import { DuckDuckGoSearchTool } from "beeai-framework/tools/search/duckDuckGoSearch";
 
 interface Skill {
   skillName: string;
@@ -17,27 +18,68 @@ interface AgentResponse {
 
 export class SkillExtractorAgent {
   private llm: any;
+  private duckDuckGoSearchTool: DuckDuckGoSearchTool;
 
   constructor() {
     this.llm = new WatsonxChatModel("ibm/granite-3-8b-instruct");
+    this.duckDuckGoSearchTool = new DuckDuckGoSearchTool();
   }
 
   async run(jobDescription: string): Promise<AgentResponse> {
     try {
-      const prompt = `Analyze the following job description and extract the key skills and qualifications.
-      For each skill, provide a brief description and an importance level (High, Medium, or Low).
-      Return the results as a JSON array of skill objects.
+      // 1. Search for skills related to the job description
+      const searchQuery = `key skills for ${jobDescription}`;
+      console.log(`Searching DuckDuckGo for: ${searchQuery}`);
+      const searchResults = await this.duckDuckGoSearchTool.run({
+        query: searchQuery,
+      });
 
-      Job Description:
-      ${jobDescription}
+      const prompt = `You are an expert at extracting skills from job descriptions, and finding information about the skills.
+      You must return a JSON array of EXACTLY 5 skill objects, where each object includes the skill name, a brief description, and an importance level (High, Medium, or Low).
+      You are given a job description, and also a list of web search results that may be helpful in extracting the skills.
+      Be sure the result contains array and not anything else, even there are no search results:
+      Example:
+      [
+        {
+          "skillName": "Python",
+          "description": "Proficiency in Python programming language.",
+          "importance": "High"
+        },
+        {
+          "skillName": "Data Analysis",
+          "description": "Experience with data analysis techniques and tools.",
+          "importance": "Medium"
+        },
+        {
+          "skillName": "Communication",
+          "description": "Strong written and verbal communication skills.",
+          "importance": "High"
+        },
+        {
+          "skillName": "Machine Learning",
+          "description": "Knowledge in machine learning algorithms",
+          "importance": "Medium"
+        },
+        {
+          "skillName": "SQL",
+          "description": "Experience with SQL is needed to access all the data",
+          "importance": "Medium"
+        }
+      ]
+      
+      Here's the job description: ${jobDescription}
+      Here's the web search results: ${JSON.stringify(searchResults.results)}
       `;
 
       const response = await this.llm.create({
         messages: [
           Message.of({
             role: "system",
-            text: `You are an expert at extracting skills from job descriptions.
-            You must return a JSON array of skill objects, where each object includes the skill name, a brief description, and an importance level (High, Medium, or Low).
+            text: `You are an expert at extracting skills from job descriptions, and finding information about the skills.
+            You must return a JSON array of EXACTLY 5 skill objects, where each object includes the skill name, a brief description, and an importance level (High, Medium, or Low).
+            You are given a job description, and also a list of web search results that may be helpful in extracting the skills.
+
+            Be sure the result contains array and not anything else, even there are no search results:
             Example:
             [
               {
@@ -54,6 +96,16 @@ export class SkillExtractorAgent {
                 "skillName": "Communication",
                 "description": "Strong written and verbal communication skills.",
                 "importance": "High"
+              },
+              {
+                "skillName": "Machine Learning",
+                "description": "Knowledge in machine learning algorithms",
+                "importance": "Medium"
+              },
+              {
+                "skillName": "SQL",
+                "description": "Experience with SQL is needed to access all the data",
+                "importance": "Medium"
               }
             ]`,
           }),

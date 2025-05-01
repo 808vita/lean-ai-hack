@@ -86,7 +86,7 @@ export default function Home() {
   useEffect(() => {
     const getDetails = async () => {
       if (selectedJob) {
-        const details = await fetchJobDetails(selectedJob.description);
+        const details = await fetchJobDetails(selectedJob.title);
         if (details?.data) {
           setSkills(details?.data);
         }
