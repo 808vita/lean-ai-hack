@@ -128,7 +128,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
             }
             fileName={`Skills and Roadmap for ${jobTitle || "N/A"}.pdf`}
             style={{
-              backgroundColor: "#3490dc",
+              backgroundColor: allRoadmapsLoaded ? "#3490dc" : "#94a3b8",
               color: "white",
               padding: "0.5rem 1rem",
               borderRadius: "0.25rem",
@@ -136,6 +136,8 @@ const SkillModal: React.FC<SkillModalProps> = ({
               fontWeight: "bold",
               display: "inline-block",
               fontSize: "1rem",
+              pointerEvents: allRoadmapsLoaded ? "auto" : "none",
+              opacity: allRoadmapsLoaded ? 1 : 0.5,
             }}
           >
             {({ blob, url, loading, error }) =>
