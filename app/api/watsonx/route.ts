@@ -1,17 +1,15 @@
 // app/api/watsonx/route.ts
 import { NextResponse, NextRequest } from "next/server";
-import {
-  DuckDuckGoJobFinderAgent,
-  JobTitleExtractionAgent,
-} from "@/lib/ai/jobFinderAgent";
+import { OrchestratorAgent } from "@/lib/ai/jobFinderAgent";
 
 interface RequestBody {
   location: string;
+  sectors?: string[];
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const { location } = (await req.json()) as RequestBody;
+    const { location, sectors } = (await req.json()) as RequestBody;
 
     if (!location) {
       return NextResponse.json(
@@ -20,28 +18,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const duckDuckGoJobFinderAgent = new DuckDuckGoJobFinderAgent();
-    const duckDuckGoResponse = await duckDuckGoJobFinderAgent.run(location);
+    const orchestratorAgent = new OrchestratorAgent();
+    const response = await orchestratorAgent.run(location, sectors);
 
-    if (!duckDuckGoResponse.success) {
-      return NextResponse.json(
-        { error: duckDuckGoResponse.error },
-        { status: 500 }
-      );
-    }
-    const jobTitleExtractionAgent = new JobTitleExtractionAgent();
-    const refineResponse = await jobTitleExtractionAgent.run(
-      duckDuckGoResponse.data
-    );
-
-    if (!refineResponse.success) {
-      return NextResponse.json(
-        { error: refineResponse.error },
-        { status: 500 }
-      );
+    if (!response.success) {
+      return NextResponse.json({ error: response.error }, { status: 500 });
     }
 
-    return NextResponse.json({ data: refineResponse.data });
+    return NextResponse.json({ data: response.data });
   } catch (error: any) {
     console.error("API error:", error);
     return NextResponse.json(

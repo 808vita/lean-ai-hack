@@ -22,19 +22,39 @@ export class DuckDuckGoJobFinderAgent {
     this.duckDuckGoSearchTool = new DuckDuckGoSearchTool();
   }
 
-  async run(location: string): Promise<AgentResponse> {
+  async run(location: string, sectors?: string[]): Promise<AgentResponse> {
     try {
-      const searchQuery = `jobs in ${location}`;
+      let searchResults: any[] = [];
 
-      console.log(`Searching DuckDuckGo for: ${searchQuery}`);
+      if (sectors && sectors.length > 0) {
+        // Search for each sector
+        for (const sector of sectors) {
+          const searchQuery = `jobs in ${location} in the ${sector} sector`;
+          console.log(`Searching DuckDuckGo for: ${searchQuery}`);
 
-      const searchResults = await this.duckDuckGoSearchTool.run({
-        query: searchQuery,
-      });
+          const sectorResults = await this.duckDuckGoSearchTool.run({
+            query: searchQuery,
+          });
 
-      console.log(`DuckDuckGo results:`, searchResults);
+          if (sectorResults && sectorResults.results) {
+            searchResults = searchResults.concat(sectorResults.results);
+          }
+        }
+      } else {
+        // Basic search without sectors
+        const searchQuery = `jobs in ${location}`;
+        console.log(`Searching DuckDuckGo for: ${searchQuery}`);
 
-      return { success: true, data: searchResults.results };
+        const basicResults = await this.duckDuckGoSearchTool.run({
+          query: searchQuery,
+        });
+
+        if (basicResults && basicResults.results) {
+          searchResults = basicResults.results;
+        }
+      }
+
+      return { success: true, data: searchResults };
     } catch (error: any) {
       console.error(`JobFinderAgent error:`, error);
       return {
@@ -100,6 +120,51 @@ export class JobTitleExtractionAgent {
         success: false,
         data: null,
         error: `JobFinderAgent failed: ${error.message}`,
+      };
+    }
+  }
+}
+
+export class OrchestratorAgent {
+  async run(location: string, sectors?: string[]): Promise<AgentResponse> {
+    try {
+      const duckDuckGoJobFinderAgent = new DuckDuckGoJobFinderAgent();
+      const jobTitleExtractionAgent = new JobTitleExtractionAgent();
+
+      const duckDuckGoResponse = await duckDuckGoJobFinderAgent.run(
+        location,
+        sectors
+      );
+
+      if (!duckDuckGoResponse.success) {
+        console.log(duckDuckGoResponse, "duckDuckGoResponse");
+
+        return {
+          success: false,
+          data: null,
+          error: "Failed to retrieve data from one or more agents",
+        };
+      }
+
+      const refineResponse = await jobTitleExtractionAgent.run(
+        duckDuckGoResponse.data
+      );
+
+      if (!refineResponse.success) {
+        return {
+          success: false,
+          data: null,
+          error: refineResponse.error,
+        };
+      }
+
+      return { success: true, data: refineResponse.data };
+    } catch (error: any) {
+      console.error("API error:", error);
+      return {
+        success: false,
+        data: null,
+        error: `Failed to process request: ${error.message}`,
       };
     }
   }

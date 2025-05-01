@@ -20,6 +20,7 @@ export default function Home() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [skills, setSkills] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sectors, setSectors] = useState<string[]>([]);
 
   const fetchJobDetails = async (jobDescription: string) => {
     setIsSkillsLoading(true);
@@ -51,7 +52,7 @@ export default function Home() {
       setIsSkillsLoading(false);
     }
   };
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, newSectors: string[]) => {
     e.preventDefault();
     setIsJobsLoading(true);
     setError(null);
@@ -64,7 +65,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ location }),
+        body: JSON.stringify({ location, sectors: newSectors }),
       });
 
       if (!response.ok) {
@@ -110,6 +111,7 @@ export default function Home() {
         setLocation={setLocation}
         handleSubmit={handleSubmit}
         isLoading={isJobsLoading}
+        setSectors={setSectors}
       />
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
