@@ -25,7 +25,8 @@ export class RoadmapGeneratorAgent {
   async run(skillName: string): Promise<AgentResponse> {
     try {
       const prompt = `Generate a learning roadmap for the skill "${skillName}".
-      The roadmap should include a series of steps, each with a name, a brief description, and a list of links to free online resources for learning that step.
+      The roadmap should include a maximum of four steps, each with a name, a brief description. Create the link so if the user press on it, it will direct to a search to DuckDuckGo using this "free online resources for <step name> in <skillName>" as a string .
+      Each step must be a high level topic, be sure that all text can fit in PDF.
       Return the roadmap as a JSON array of step objects.`;
 
       const response = await this.llm.create({
@@ -33,31 +34,38 @@ export class RoadmapGeneratorAgent {
           Message.of({
             role: "system",
             text: `You are an expert at creating learning roadmaps.
-            Given a skill, you will generate a series of steps, each with a name, a brief description, and a list of links to free online resources for learning that step.
+            Given a skill, you will generate a learning roadmap with a maximum of four steps, each with a name, a brief description. 
+            Each step must be a high level topic. The description is maximum 200 words to ensure that all text can fit in PDF. The links is for the DDG using  "free online resources for <step name> in <skillName>".
+
+            Be sure the result contains array and not anything else. The list has 4 steps:
             Example Output:
             [
               {
                 "name": "Introduction to Python",
                 "description": "Learn the basic syntax and data structures of Python.",
                 "resourceLinks": [
-                  "https://www.codecademy.com/learn/learn-python-3",
-                  "https://www.learnpython.org/"
+                  "https://duckduckgo.com/?q=free+online+resources+for+Introduction+to+Python+in+Python",
                 ]
               },
               {
                 "name": "Python Data Structures",
                 "description": "Dive deeper into Lists, Dictionaries, and other data structures.",
                 "resourceLinks": [
-                  "https://www.tutorialspoint.com/python/python_data_types.htm",
-                  "https://realpython.com/python-data-structures/"
+                 "https://duckduckgo.com/?q=free+online+resources+for+Python+Data+Structures+in+Python",
                 ]
               },
               {
                 "name": "Object-Oriented Programming in Python",
                 "description": "Understand OOP concepts and implement classes and objects.",
                 "resourceLinks": [
-                  "https://realpython.com/oop-in-python-vs-traditional-programming/",
-                  "https://www.programiz.com/python-programming/object-oriented-programming"
+                  "https://duckduckgo.com/?q=free+online+resources+for+Object-Oriented+Programming+in+Python+in+Python",
+                ]
+              },
+              {
+                "name": "Algorithms in Python",
+                "description": "Dive deeper into Algorithms",
+                "resourceLinks": [
+                  "https://duckduckgo.com/?q=free+online+resources+for+Algorithms+in+Python+in+Python",
                 ]
               }
             ]`,
