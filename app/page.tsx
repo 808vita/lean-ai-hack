@@ -138,17 +138,22 @@ export default function Home() {
         </div>
       )}
       {isModalOpen && skills.length > 0 && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded p-4">
-            <h2 className="text-xl font-semibold mb-2">
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center overflow-auto p-4">
+          <div className="bg-white rounded p-6 shadow-lg w-full max-w-lg mx-auto">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
               Skills for {selectedJob?.title}
             </h2>
-            <ul>
+            <ul className="max-h-[60vh] overflow-y-auto">
               {skills.map((skill: any, index: number) => (
-                <li key={index} className="border rounded p-2 mb-2">
-                  <h3 className="font-semibold">{skill.skillName}</h3>
-                  <p>{skill.description}</p>
-                  <p>Importance: {skill.importance}</p>
+                <li key={index} className="border rounded p-4 mb-3 bg-gray-50">
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    {skill.skillName}
+                  </h3>
+                  <p className="text-gray-600">{skill.description}</p>
+                  <p className="text-sm text-gray-500">
+                    Importance:{" "}
+                    <span className="font-medium">{skill.importance}</span>
+                  </p>
                 </li>
               ))}
             </ul>
@@ -158,7 +163,7 @@ export default function Home() {
                 setSelectedJob(null);
                 setSkills([]);
               }}
-              className="bg-gray-300 text-gray-700 rounded p-2 hover:bg-gray-400"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4"
             >
               Close
             </button>
