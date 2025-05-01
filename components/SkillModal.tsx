@@ -127,6 +127,16 @@ const SkillModal: React.FC<SkillModalProps> = ({
               />
             }
             fileName={`Skills and Roadmap for ${jobTitle || "N/A"}.pdf`}
+            style={{
+              backgroundColor: "#3490dc",
+              color: "white",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.25rem",
+              textDecoration: "none",
+              fontWeight: "bold",
+              display: "inline-block",
+              fontSize: "1rem",
+            }}
           >
             {({ blob, url, loading, error }) =>
               loading ? "Loading document..." : "Export to PDF"
