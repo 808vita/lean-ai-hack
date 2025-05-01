@@ -83,10 +83,12 @@ export default function Home() {
   useEffect(() => {
     const getDetails = async () => {
       if (selectedJob) {
+        setIsLoading(true);
         const details = await fetchJobDetails(selectedJob.description);
         if (details?.data) {
           setSkills(details?.data);
         }
+        setIsLoading(false);
       }
     };
     getDetails();
@@ -124,6 +126,7 @@ export default function Home() {
         }}
         skills={skills}
         jobTitle={selectedJob?.title}
+        isLoading={isLoading}
       />
     </div>
   );

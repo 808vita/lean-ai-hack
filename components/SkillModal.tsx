@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Roadmap from "@/components/Roadmap";
 import PDFDocument from "@/components/PDFDocument";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import LoadingIndicator from "@/components/LoadingIndicator";
 
 interface Skill {
   skillName: string;
@@ -21,6 +22,7 @@ interface SkillModalProps {
   onClose: () => void;
   skills: Skill[];
   jobTitle: string | undefined;
+  isLoading: boolean;
 }
 
 const SkillModal: React.FC<SkillModalProps> = ({
@@ -28,15 +30,16 @@ const SkillModal: React.FC<SkillModalProps> = ({
   onClose,
   skills,
   jobTitle,
+  isLoading,
 }) => {
   const [roadmaps, setRoadmaps] = useState<RoadmapStep[][]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Start with loading true
+  const [isRoadmapsLoading, setIsRoadmapsLoading] = useState(true); // Start with loading true
   const [error, setError] = useState<string | null>(null);
   const [allRoadmapsLoaded, setAllRoadmapsLoaded] = useState(false);
 
   useEffect(() => {
     const fetchRoadmaps = async () => {
-      setIsLoading(true);
+      setIsRoadmapsLoading(true);
       setError(null);
       setAllRoadmapsLoaded(false);
 
@@ -70,7 +73,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
         setRoadmaps([]);
         setAllRoadmapsLoaded(false);
       } finally {
-        setIsLoading(false);
+        setIsRoadmapsLoading(false);
       }
     };
 
@@ -78,7 +81,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
       fetchRoadmaps();
     } else {
       setRoadmaps([]); // Clear roadmaps when the modal is closed or skills are empty
-      setIsLoading(true); // Reset loading state when modal is closed
+      setIsRoadmapsLoading(true); // Reset loading state when modal is closed
       setAllRoadmapsLoaded(false);
     }
   }, [isOpen, skills]);
@@ -91,7 +94,12 @@ const SkillModal: React.FC<SkillModalProps> = ({
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">
           Skills for {jobTitle}
         </h2>
-        {isLoading && skills.length > 0 && <p>Loading roadmaps...</p>}
+        {isLoading && skills.length == 0 && (
+          <LoadingIndicator message="Loading Skills and please wait for the Roadmap..." />
+        )}
+        {isRoadmapsLoading && skills.length > 0 && (
+          <LoadingIndicator message="Loading Roadmaps..." />
+        )}
         {error && <p className="text-red-500">{error}</p>}
         <div>
           {skills.map((skill, index) => (
@@ -105,7 +113,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
                 <span className="font-medium">{skill.importance}</span>
               </p>
               {/* Only show the Roadmap component when it's not loading or there's an error */}
-              {(!isLoading || error) && (
+              {(!isRoadmapsLoading || error) && (
                 <Roadmap roadmap={roadmaps[index] || []} />
               )}
             </div>
