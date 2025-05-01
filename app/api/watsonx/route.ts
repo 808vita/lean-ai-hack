@@ -1,6 +1,9 @@
 // app/api/watsonx/route.ts
 import { NextResponse, NextRequest } from "next/server";
-import { JobFinderAgent } from "@/lib/ai/jobFinderAgent";
+import {
+  DuckDuckGoJobFinderAgent,
+  JobTitleExtractionAgent,
+} from "@/lib/ai/jobFinderAgent";
 
 interface RequestBody {
   location: string;
@@ -17,14 +20,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const jobFinderAgent = new JobFinderAgent();
-    const response = await jobFinderAgent.run(location);
+    const duckDuckGoJobFinderAgent = new DuckDuckGoJobFinderAgent();
+    const duckDuckGoResponse = await duckDuckGoJobFinderAgent.run(location);
 
-    if (!response.success) {
-      return NextResponse.json({ error: response.error }, { status: 500 });
+    if (!duckDuckGoResponse.success) {
+      return NextResponse.json(
+        { error: duckDuckGoResponse.error },
+        { status: 500 }
+      );
+    }
+    const jobTitleExtractionAgent = new JobTitleExtractionAgent();
+    const refineResponse = await jobTitleExtractionAgent.run(
+      duckDuckGoResponse.data
+    );
+
+    if (!refineResponse.success) {
+      return NextResponse.json(
+        { error: refineResponse.error },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ data: response.data });
+    return NextResponse.json({ data: refineResponse.data });
   } catch (error: any) {
     console.error("API error:", error);
     return NextResponse.json(

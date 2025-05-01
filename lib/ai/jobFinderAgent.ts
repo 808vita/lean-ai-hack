@@ -15,18 +15,16 @@ interface AgentResponse {
   error?: string;
 }
 
-export class JobFinderAgent {
+export class DuckDuckGoJobFinderAgent {
   private duckDuckGoSearchTool: DuckDuckGoSearchTool;
-  private llm: any;
 
   constructor() {
     this.duckDuckGoSearchTool = new DuckDuckGoSearchTool();
-    this.llm = new WatsonxChatModel("ibm/granite-3-8b-instruct");
   }
 
   async run(location: string): Promise<AgentResponse> {
     try {
-      const searchQuery = `in demand jobs in ${location}`;
+      const searchQuery = `jobs in ${location}`;
 
       console.log(`Searching DuckDuckGo for: ${searchQuery}`);
 
@@ -36,15 +34,30 @@ export class JobFinderAgent {
 
       console.log(`DuckDuckGo results:`, searchResults);
 
-      // Extract job titles and descriptions from search results.
-      // This is a simplified approach. A more robust solution might
-      // involve parsing the HTML content of the search results.
-      //Refactor with LLM
-      const llmResponse = await this.llm.create({
-        messages: [
-          Message.of({
-            role: "system",
-            text: `You are an expert at extracting job information from a list of unstructured text. You will receive a list of job details and format it to a JSON format with the "title" and "description" keys. The returned result must be JSON only.
+      return { success: true, data: searchResults.results };
+    } catch (error: any) {
+      console.error(`JobFinderAgent error:`, error);
+      return {
+        success: false,
+        data: null,
+        error: `JobFinderAgent failed: ${error.message}`,
+      };
+    }
+  }
+}
+
+export class JobTitleExtractionAgent {
+  private llm: any;
+
+  constructor() {
+    this.llm = new WatsonxChatModel("ibm/granite-3-8b-instruct");
+  }
+
+  async run(searchResults: any): Promise<AgentResponse> {
+    try {
+      const prompt = `You are an expert at extracting job information from a list of unstructured text. You will receive a list of job details and format it to a JSON format with the "title" and "description" keys. The title MUST be a job name.
+      Skip any results that look like "100+ jobs in london" and is not a job name.
+      The returned result must be JSON only.
             Example:
             [
               {
@@ -59,12 +72,17 @@ export class JobFinderAgent {
                 "title": "Project Manager",
                 "description": "Experienced project manager needed to lead software development projects."
               }
-            ]
-            `,
+            ]`;
+
+      const llmResponse = await this.llm.create({
+        messages: [
+          Message.of({
+            role: "system",
+            text: prompt,
           }),
           Message.of({
             role: "user",
-            text: JSON.stringify(searchResults.results),
+            text: JSON.stringify(searchResults),
           }),
         ],
       });
