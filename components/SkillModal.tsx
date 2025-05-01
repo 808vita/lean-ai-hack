@@ -80,7 +80,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center overflow-auto p-4">
-      <div className="bg-white rounded p-6 shadow-lg w-full max-w-lg mx-auto">
+      <div className="bg-white rounded p-6 shadow-lg w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">
           Skills for {jobTitle}
         </h2>
