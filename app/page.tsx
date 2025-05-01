@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import LocationForm from "@/components/LocationForm";
 import JobList from "@/components/JobList";
 import SkillModal from "@/components/SkillModal";
+import LoadingIndicator from "@/components/LoadingIndicator";
 
 interface Job {
   title: string;
@@ -13,14 +14,15 @@ interface Job {
 export default function Home() {
   const [location, setLocation] = useState("");
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isJobsLoading, setIsJobsLoading] = useState(false);
+  const [isSkillsLoading, setIsSkillsLoading] = useState(false); //New State
   const [error, setError] = useState<string | null>(null);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [skills, setSkills] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchJobDetails = async (jobDescription: string) => {
-    setIsLoading(true);
+    setIsSkillsLoading(true);
     setError(null);
 
     try {
@@ -46,12 +48,12 @@ export default function Home() {
       setError(error.message);
       return null;
     } finally {
-      setIsLoading(false);
+      setIsSkillsLoading(false);
     }
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsJobsLoading(true);
     setError(null);
     setSkills([]);
     setSelectedJob(null);
@@ -76,19 +78,17 @@ export default function Home() {
       setError(error.message);
       setJobs([]);
     } finally {
-      setIsLoading(false);
+      setIsJobsLoading(false);
     }
   };
 
   useEffect(() => {
     const getDetails = async () => {
       if (selectedJob) {
-        setIsLoading(true);
         const details = await fetchJobDetails(selectedJob.description);
         if (details?.data) {
           setSkills(details?.data);
         }
-        setIsLoading(false);
       }
     };
     getDetails();
@@ -109,12 +109,13 @@ export default function Home() {
         location={location}
         setLocation={setLocation}
         handleSubmit={handleSubmit}
-        isLoading={isLoading}
+        isLoading={isJobsLoading}
       />
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
 
-      {jobs.length > 0 && (
+      {isJobsLoading && <LoadingIndicator message="Loading Jobs..." />}
+      {!isJobsLoading && jobs.length > 0 && (
         <JobList jobs={jobs} onJobSelect={(job) => setSelectedJob(job)} />
       )}
       <SkillModal
@@ -126,7 +127,7 @@ export default function Home() {
         }}
         skills={skills}
         jobTitle={selectedJob?.title}
-        isLoading={isLoading}
+        isLoading={isSkillsLoading} // use the new state variable
       />
     </div>
   );
