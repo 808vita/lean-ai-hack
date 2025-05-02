@@ -10,12 +10,7 @@ interface LocationFormProps {
   setSectors: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const sectors = [
-  "Technology",
-"Transport",
-  "Finance",
-  "Education",
-];
+const sectors = ["Technology", "Transport", "Finance", "Education"];
 
 const LocationForm: React.FC<LocationFormProps> = ({
   location,
@@ -26,14 +21,15 @@ const LocationForm: React.FC<LocationFormProps> = ({
 }) => {
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [customSector, setCustomSector] = useState("");
-  const maxSectors = 1;
 
   const toggleSector = (sector: string) => {
-    setSelectedSectors((prev) =>
-      prev.includes(sector)
-        ? prev.filter((s) => s !== sector)
-        : [...prev, sector]
-    );
+    setSelectedSectors((prev) => {
+      if (prev.includes(sector)) {
+        return []; // Deselect if already selected
+      } else {
+        return [sector]; // Deselect all and select the new sector
+      }
+    });
   };
 
   const handleCustomSectorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,11 +37,9 @@ const LocationForm: React.FC<LocationFormProps> = ({
   };
 
   const handleAddCustomSector = () => {
-    if (customSector.trim() !== "" && selectedSectors.length < maxSectors) {
-      setSelectedSectors((prev) => [...prev, customSector.trim()]);
+    if (customSector.trim() !== "") {
+      setSelectedSectors([customSector.trim()]); // Replace current selection with custom sector
       setCustomSector("");
-    } else if (selectedSectors.length >= maxSectors) {
-      alert(`You can only select a maximum of ${maxSectors} sectors.`);
     }
   };
 
@@ -67,7 +61,7 @@ const LocationForm: React.FC<LocationFormProps> = ({
       {/* Sector Selection */}
       <div className="mb-2">
         <label className="block text-gray-700 text-sm font-bold mb-2">
-          Select Sectors (Max {maxSectors}):
+          Select One Sector:
         </label>
         <div className="flex flex-wrap">
           {sectors.map((sector) => (
@@ -114,7 +108,6 @@ const LocationForm: React.FC<LocationFormProps> = ({
           type="button"
           onClick={handleAddCustomSector}
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          disabled={selectedSectors.length >= maxSectors}
         >
           Add
         </button>
