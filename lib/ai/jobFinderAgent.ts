@@ -75,24 +75,35 @@ export class JobTitleExtractionAgent {
 
   async run(searchResults: any): Promise<AgentResponse> {
     try {
-      const prompt = `You are an expert at extracting job information from a list of unstructured text. You will receive a list of job details and format it to a JSON format with the "title" and "description" keys. The title MUST be a job name.
-      Skip any results that look like "100+ jobs in london" and is not a job name.
+      const prompt = `You are an expert at extracting job information from a list of unstructured text and creating concise, accurate job descriptions. You will receive a list of job details, including job titles, and format it to a JSON format with the "title" and "description" keys. The "title" MUST be a job name. The "description" should be a brief (1-2 sentence) summary of the job, accurately reflecting the role's key responsibilities, required skills, and overall purpose.
+
+      Skip any results that look like "100+ jobs in london" or are not a job name.
+
+      Focus on providing factual and relevant descriptions directly related to the job title. Avoid generic phrases and focus on specifics.
+
       The returned result must be JSON only.
-            Example:
-            [
-              {
-                "title": "Software Engineer",
-                "description": "Seeking a skilled software engineer to develop web applications."
-              },
-              {
-                "title": "Data Scientist",
-                "description": "Looking for a data scientist to analyze data and build models."
-              },
-              {
-                "title": "Project Manager",
-                "description": "Experienced project manager needed to lead software development projects."
-              }
-            ]`;
+
+      Here's an example of the required JSON format:
+
+      [
+        {
+          "title": "Software Engineer (Backend)",
+          "description": "Designs, develops, and maintains server-side logic and APIs for web applications using Java and Spring Boot. Requires strong problem-solving skills and experience with database systems like PostgreSQL."
+        },
+        {
+          "title": "Data Scientist (Machine Learning)",
+          "description": "Develops and implements machine learning models to solve business problems, using Python and scikit-learn. Requires a strong understanding of statistical modeling and experience with data visualization tools like Tableau."
+        },
+        {
+          "title": "Marketing Manager (Digital)",
+          "description": "Develops and executes digital marketing campaigns across various channels, including social media, email, and search engines. Requires strong analytical skills and experience with marketing automation platforms."
+        },
+        {
+          "title": "Project Manager (Agile)",
+          "description": "Leads cross-functional teams to deliver software projects using Agile methodologies, ensuring projects are completed on time and within budget. Requires excellent communication and organizational skills and experience with Jira and Confluence."
+        }
+      ]
+      `;
 
       const llmResponse = await this.llm.create({
         messages: [
