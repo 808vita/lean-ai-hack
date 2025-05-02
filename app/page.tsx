@@ -104,18 +104,22 @@ export default function Home() {
   }, [selectedJob]);
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-4 flex flex-col items-center justify-center">
+      {" "}
+      {/* Add flexbox classes here */}
       <h1 className="text-2xl font-bold mb-4">Job Finder</h1>
-      <LocationForm
-        location={location}
-        setLocation={setLocation}
-        handleSubmit={handleSubmit}
-        isLoading={isJobsLoading}
-        setSectors={setSectors}
-      />
-
+      <div className="w-full max-w-md">
+        {" "}
+        {/* Limit width of the form */}
+        <LocationForm
+          location={location}
+          setLocation={setLocation}
+          handleSubmit={handleSubmit}
+          isLoading={isJobsLoading}
+          setSectors={setSectors}
+        />
+      </div>
       {error && <div className="text-red-500 mb-4">{error}</div>}
-
       {isJobsLoading && <LoadingIndicator message="Loading Jobs..." />}
       {!isJobsLoading && jobs.length > 0 && (
         <JobList jobs={jobs} onJobSelect={(job) => setSelectedJob(job)} />
