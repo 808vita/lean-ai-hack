@@ -50,17 +50,20 @@ const LocationForm: React.FC<LocationFormProps> = ({
   };
 
   return (
-    <form onSubmit={onSubmit} className="mb-4">
+    <form onSubmit={onSubmit} className="mb-6">
+      <label className="block text-gray-700 text-sm font-bold mb-2">
+        Enter Location:
+      </label>
       <input
         type="text"
         placeholder="Enter location"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
-        className="border rounded p-2 mr-2 w-64"
+        className="border rounded p-2 mr-2 w-64 text-lg mb-4"
       />
 
       {/* Sector Selection */}
-      <div className="mb-2">
+      <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
           Select One Sector:
         </label>
@@ -69,7 +72,7 @@ const LocationForm: React.FC<LocationFormProps> = ({
             <button
               key={sector}
               type="button"
-              className={`text-gray-700 font-bold py-2 px-4 rounded mr-2 mb-2 
+              className={`text-gray-700 font-bold py-2 px-4 rounded mr-2 mb-2
               ${
                 selectedSectors.includes(sector)
                   ? "bg-green-500 text-white"
@@ -97,13 +100,16 @@ const LocationForm: React.FC<LocationFormProps> = ({
       </div>
 
       {/* Custom Sector Input */}
-      <div className="flex items-center mb-2">
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Enter Custom Sector:
+        </label>
         <input
           type="text"
           placeholder="Enter custom sector"
           value={customSector}
           onChange={handleCustomSectorChange}
-          className="border rounded p-2 mr-2 w-48"
+          className="border rounded p-2 mr-2 w-48 text-lg mb-2"
         />
         <button
           type="button"
@@ -114,21 +120,23 @@ const LocationForm: React.FC<LocationFormProps> = ({
         </button>
       </div>
 
-      <button
-        type="submit"
-        className="bg-blue-500 text-white rounded p-2 hover:bg-blue-700"
-        disabled={isLoading || location.trim() === ""}
-      >
-        {isLoading ? "Loading..." : "Find Jobs"}
-      </button>
+      <div className="mt-4">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white rounded p-3 text-lg font-bold hover:bg-blue-700"
+          disabled={isLoading || location.trim() === ""}
+        >
+          {isLoading ? "Loading..." : "Find Jobs"}
+        </button>
 
-      <button
-        type="button"
-        className="border border-gray-500 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-200 focus:outline-none focus:shadow-outline ml-2"
-        onClick={() => setIsAboutModalOpen(true)}
-      >
-        About C-Kur
-      </button>
+        <button
+          type="button"
+          className="border border-gray-500 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-200 focus:outline-none focus:shadow-outline ml-2"
+          onClick={() => setIsAboutModalOpen(true)}
+        >
+          About C-Kur
+        </button>
+      </div>
       <AboutModal
         isOpen={isAboutModalOpen}
         onClose={() => setIsAboutModalOpen(false)}
