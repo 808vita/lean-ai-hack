@@ -105,11 +105,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen p-4 flex flex-col items-center justify-center">
-      {" "}
       {/* Add flexbox classes here */}
-      <h1 className="text-2xl font-bold mb-4">Job Finder</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        C-Kur: Map Your Skills, Chart Your Career
+      </h1>
       <div className="w-full max-w-md">
-        {" "}
         {/* Limit width of the form */}
         <LocationForm
           location={location}

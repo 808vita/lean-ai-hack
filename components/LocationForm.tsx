@@ -1,7 +1,7 @@
 // components/LocationForm.tsx
 "use client";
 import React, { useState } from "react";
-
+import AboutModal from "@/components/AboutModal"; // Import AboutModal
 interface LocationFormProps {
   location: string;
   setLocation: React.Dispatch<React.SetStateAction<string>>;
@@ -21,6 +21,7 @@ const LocationForm: React.FC<LocationFormProps> = ({
 }) => {
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [customSector, setCustomSector] = useState("");
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false); // Add local state
 
   const toggleSector = (sector: string) => {
     setSelectedSectors((prev) => {
@@ -120,6 +121,18 @@ const LocationForm: React.FC<LocationFormProps> = ({
       >
         {isLoading ? "Loading..." : "Find Jobs"}
       </button>
+
+      <button
+        type="button"
+        className="border border-gray-500 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-200 focus:outline-none focus:shadow-outline ml-2"
+        onClick={() => setIsAboutModalOpen(true)}
+      >
+        About C-Kur
+      </button>
+      <AboutModal
+        isOpen={isAboutModalOpen}
+        onClose={() => setIsAboutModalOpen(false)}
+      />
     </form>
   );
 };
