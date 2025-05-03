@@ -94,6 +94,30 @@ graph TD
     E --> N;
 ```
 
+## AI Agent Interaction
+
+This diagram illustrates how the AI agents interact within the C-Kur application.
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+graph TD
+    A[User Input: Location, Sector] --> B(DuckDuckGoJobFinderAgent);
+    B -- Job Postings from DuckDuckGo --> C(JobTitleExtractionAgent);
+    C -- Structured Job Data --> D{User Selects Job};
+    D --> E(SkillExtractorAgent);
+    E -- List of Skills --> F{For Each Skill};
+    F --> G(RoadmapGeneratorAgent);
+    G -- Learning Roadmap --> H[Display to User];
+
+    class A,B,C,D,E,F,G,H default;
+    subgraph AI Agents
+    B
+    C
+    E
+    G
+    end
+```
+
 ## API Endpoints
 
 - `/api/watsonx`:
