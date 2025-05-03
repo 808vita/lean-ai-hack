@@ -70,6 +70,30 @@ C-Kur uses DuckDuckGo to search for job postings in a given location and sector.
 4.  **View Job Details:** Click on a job card to view the details of the job, including the required skills and a learning roadmap.
 5.  **Export to PDF:** Click the "Export to PDF" button to generate a PDF document containing the job details.
 
+## User Flow
+
+This section outlines the user flow within the application.
+
+### Process Flow Diagram (Overall)
+
+```mermaid
+graph TD
+    A[User Starts] --> B{Enters Location & Submits Form};
+    B --> C{Request to /api/watsonx Successful?};
+    C -- Yes --> D[Displays Job List];
+    C -- No --> E[Displays Error Message];
+    D --> F{User Selects a Job?};
+    F -- Yes --> G{Request Skill Details & Roadmap};
+    G --> H[Loading Skills & Roadmaps];
+    H --> I{All Skills & Roadmaps Loaded?};
+    I -- Yes --> J[Displays Skills & Roadmaps];
+    J --> L{User Downloads PDF?};
+    L -- Yes --> M[Generates and Downloads PDF];
+    L -- No --> N[End];
+    F -- No --> N;
+    E --> N;
+```
+
 ## API Endpoints
 
 - `/api/watsonx`:
