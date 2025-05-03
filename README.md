@@ -2,6 +2,9 @@
 
 C-Kur is an application that helps workforce development programs in underserved communities identify the specific skills that are most in-demand by local employers, aligning with the "Decent Work and Economic Growth Challenge".
 
+https://github.com/user-attachments/assets/116fb97b-ac56-4286-8eb5-2e302926854b
+
+
 ## Problem
 
 Workforce development programs in underserved communities often struggle to identify the specific skills that are most in-demand by local employers.
